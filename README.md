@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚽ World Cup 2026 Match Predictor
+# ⚽ World Cup 2026 Match Predictor 2
 
 **A probabilistic forecasting engine for the 2026 FIFA World Cup knockout stage.**
 

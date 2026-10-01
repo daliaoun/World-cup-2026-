@@ -6,11 +6,16 @@
 
 It called both semi-finals correctly, *against* the betting market, before a ball was kicked.
 
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Tests](https://img.shields.io/badge/tests-16%20passing-0b6e4f)](#tests)
 [![Model](https://img.shields.io/badge/model-Dixon--Coles-c1121f)](#the-models)
-[![Metric](https://img.shields.io/badge/metric-RPS-0b6e4f)]( #evaluation )
+[![Metric](https://img.shields.io/badge/metric-RPS-0b6e4f)](#evaluation)
 [![Data](https://img.shields.io/badge/matches-49%2C509-1b1b1f)](#the-data)
 [![License](https://img.shields.io/badge/license-MIT-black)](#license)
+
+<!-- Once pushed, swap the static Tests badge for the live CI one:
+[![tests](https://github.com/<you>/<repo>/actions/workflows/ci.yml/badge.svg)](https://github.com/<you>/<repo>/actions/workflows/ci.yml) -->
+
 
 </div>
 
@@ -36,11 +41,16 @@ The most interesting findings in the whole project are the **negative** ones.
 |---|---|---|---|
 | Semi-final 1 | **Spain** (57%) | France | ✅ Spain 2-0 France |
 | Semi-final 2 | **Argentina** (56%) | England | ✅ Argentina 2-1 England |
-| **Final** | **Spain 61.7%** / Argentina 38.3% | Spain ~58% | *see repo* |
+| **Final** | **Spain** (61.7%) | Spain ~58% | ✅ Spain 1-0 Argentina |
 
-The model disagreed with the bookmakers on both semi-finals and was right twice. For the
-final it agreed with the market, and said so plainly rather than inventing a contrarian
-call.
+**Three for three** on the knockout matches it forecast. The model disagreed with the
+bookmakers on both semi-finals and was right twice; for the final it agreed with the
+market, and said so plainly rather than inventing a contrarian call.
+
+> A caveat the project makes about itself: going 3/3 is a good run, not proof. A ~60%
+> favourite winning is what *should* happen most of the time, so a handful of results can
+> never separate a good forecast from a lucky one. The real evidence is the 710-match
+> backtest below, not the scoreline.
 
 > **Honesty note built into the output:** 61.7% is the *middle* of a range that runs from
 > 45% to 75%, recovered by re-running the entire pipeline across 200 bootstrap resamples of
@@ -114,6 +124,10 @@ football match is irreducible.
 ```
 wc2026/
 ├── config.py              # central configuration (fixtures, odds, constants)
+├── pyproject.toml         # project metadata, pytest + ruff config
+├── requirements.txt
+├── .github/workflows/     # CI: runs the test suite on every push
+├── tests/                 # pytest suite (leakage, alignment, metrics, engine)
 ├── src/
 │   ├── data.py            # ingest + true 90-minute score reconstruction
 │   ├── elo.py             # Elo ratings (updated on the regulation result)
@@ -178,6 +192,27 @@ python src/backtest.py
 Knockout matches add an extra-time model (calibrated at 1.09× the regulation scoring rate,
 measured on the true population of extra-time matches) and a penalty-shootout model fitted
 on 682 historical shootouts.
+
+## Tests
+
+```bash
+pip install pytest
+pytest
+```
+
+The suite encodes the invariants that actually matter for a forecasting model:
+
+- **No leakage** — a model fit at date *t* gives identical ratings whether or not a
+  future match is in the data (`test_no_leakage.py`).
+- **Alignment guard** — predictions scored against a scrambled match order must raise,
+  not silently mis-score. This locks in a real bug caught mid-project
+  (`test_evaluate.py`).
+- **Metric correctness** — RPS is zero for a perfect forecast and rewards respecting the
+  home-draw-away ordering.
+- **Engine soundness** — the exact scoreline distribution sums to one, is symmetric for
+  equal teams, and shifts correctly with attacking strength (`test_statesim.py`).
+
+CI runs the suite on Python 3.11 and 3.12 on every push (`.github/workflows/ci.yml`).
 
 ## The data
 

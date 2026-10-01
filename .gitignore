@@ -1,0 +1,24 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# --- Raw data (re-downloadable via `python src/data.py`) ---
+data/raw/
+
+# --- Heavy regenerable intermediate (not needed at runtime) ---
+data/processed/matches_elo.csv
+
+# Keep data/processed/ otherwise, so the headline scripts run on clone:
+#   matches_feat.csv, the .npy / .npz matrices, shootout_summary.json, etc.
+# To ship a LEAN repo instead (reviewers rebuild from scratch), uncomment:
+# data/processed/
